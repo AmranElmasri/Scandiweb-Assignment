@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import {
-    setCurrencySymbol,
+  setCurrencySymbol,
   setDecreaseAmount,
   setIncreaseAmount,
 } from "../../../Store/Slices/dataSlice";
@@ -10,74 +10,77 @@ import CartItemAttributes from "./itemAttributes";
 import rightArrow from "../../../assets/right-arrow.svg";
 import leftArrow from "../../../assets/left-arrow.svg";
 
+class CartItem extends React.Component {
+  render() {
+    const {
+      id,
+      name,
+      gallery,
+      prices,
+      brand,
+      attributes,
+      amount,
+      currency,
+      setIncreaseAmount,
+      setDecreaseAmount,
+      setCurrencySymbol,
+    } = this.props;
+    const currencyFilter = prices.filter(
+      (item) => item.currency.label.toLowerCase() === currency
+    );
+    const currencySymbol = currencyFilter[0].currency.symbol;
 
-const CartItem = ({
-  id,
-  name,
-  gallery,
-  inStock,
-  prices,
-  brand,
-  attributes,
-  amount,
-  currency,
-  setIncreaseAmount,
-  setDecreaseAmount,
-  setCurrencySymbol
-}) => {
-  const currencyFilter = prices.filter(
-    (item) => item.currency.label.toLowerCase() === currency
-  );
-  const currencySymbol = currencyFilter[0].currency.symbol;
-
-  setCurrencySymbol(currencySymbol);
-
-
-  return (
-    <>
-      <hr
-        style={{
-          width: "100%",
-          height: "1px",
-          backgroundColor: "#E5E5E5",
-          margin: "20px 0",
-          textAlign: "center",
-        }}
-      />
-      <Wrapper>
-        <div className="cart__item__left">
-          <strong>{brand}</strong>
-          <p>{name}</p>
-          <h3>
-            {currencySymbol} {(currencyFilter[0].amount * amount).toFixed(2)}
-          </h3>
-          {attributes.map((attribute, index) => (
-            <div key={index}>
-              <CartItemAttributes attribute={attribute} />
+    setCurrencySymbol(currencySymbol);
+    return (
+      <>
+        <hr
+          style={{
+            width: "100%",
+            height: "1px",
+            backgroundColor: "#E5E5E5",
+            margin: "20px 0",
+            textAlign: "center",
+          }}
+        />
+        <Wrapper>
+          <div className="cart__item__left">
+            <strong>{brand}</strong>
+            <p>{name}</p>
+            <h3>
+              {currencySymbol} {(currencyFilter[0].amount * amount).toFixed(2)}
+            </h3>
+            {attributes.map((attribute, index) => (
+              <div key={index}>
+                <CartItemAttributes attribute={attribute} />
+              </div>
+            ))}
+          </div>
+          <div className="cart__item__right">
+            <div className="right__actions">
+              <button onClick={() => setIncreaseAmount(id)}>+</button>
+              <p>{amount}</p>
+              <button
+                onClick={() => setDecreaseAmount(id)}
+                disabled={amount === 1}
+              >
+                -
+              </button>
             </div>
-          ))}
-        </div>
-        <div className="cart__item__right">
-          <div className="right__actions">
-            <button onClick={() => setIncreaseAmount(id)}>+</button>
-            <p>{amount}</p>
-            <button
-              onClick={() => setDecreaseAmount(id)}
-              disabled={amount === 1}
-            >
-              -
-            </button>
+            <div className="cart__item__img">
+              <img src={gallery[0]} alt="product" />
+              <span className="right__arrow">
+                <img src={rightArrow} alt="arrow" />
+              </span>
+              <span className="left__arrow">
+                <img src={leftArrow} alt="arrow" />
+              </span>
+            </div>
           </div>
-          <div className="cart__item__img">
-            <img src={gallery[0]} alt="product" />
-            <span className="right__arrow"><img src={rightArrow} alt="arrow" /></span>
-            <span className="left__arrow"><img src={leftArrow} alt="arrow" /></span>
-          </div>
-        </div>
-      </Wrapper>
-    </>
-  );
-};
+        </Wrapper>
+      </>
+    );
+  }
+}
 
 const Wrapper = styled.div`
   display: flex;
@@ -159,7 +162,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   setIncreaseAmount,
   setDecreaseAmount,
-  setCurrencySymbol
+  setCurrencySymbol,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CartItem);

@@ -3,8 +3,8 @@ import styled from "styled-components";
 
 class itemAttributes extends React.Component {
   state = {
-    activeText: { id: this.props.attribute.items[0].id, active: true },
-    activeSwatch: { id: this.props.attribute.items[0].id, active: true },
+    activeText: { id: null, active: true },
+    activeSwatch: { id: null, active: true },
   };
 
   setTextActive = (id) => {
@@ -17,12 +17,10 @@ class itemAttributes extends React.Component {
   render() {
     const { attribute } = this.props;
     return (
-      <Wrapper key={attribute.id}>
+      <Wrapper>
         {attribute.type === "swatch" ? (
           <>
-            <div className="att__name">
-              {attribute.name}:
-            </div>
+            <div className="att__name">{attribute.name}:</div>
             <Swatch>
               {attribute.items.map((item) => (
                 <div
@@ -33,7 +31,10 @@ class itemAttributes extends React.Component {
                       : "swatch"
                   }
                   style={{ backgroundColor: item.value }}
-                  onClick={() => this.setSwatchActive(item.id)}
+                  onClick={() => {
+                    this.setSwatchActive(item.id);
+                    this.props.setAttribute({swatch: item.value});
+                  }}
                   key={item.id}
                 ></div>
               ))}
@@ -50,7 +51,10 @@ class itemAttributes extends React.Component {
                     ? "text active"
                     : "text"
                 }
-                onClick={() => this.setTextActive(item.id)}
+                onClick={() => {
+                  this.setTextActive(item.id);
+                  this.props.setAttribute({text: item.value});
+                }}
                 key={item.id}
               >
                 {item.displayValue}

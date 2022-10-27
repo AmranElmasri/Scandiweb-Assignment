@@ -9,34 +9,25 @@ import {
 } from "../../../Store/Slices/dataSlice";
 import Attributes from "./Attributes";
 
-const ModalItems = ({
-  id,
-  name,
-  gallery,
-  inStock,
-  prices,
-  brand,
-  attributes,
-  amount,
-  currency,
-  setIncreaseAmount,
-  setDecreaseAmount,
-  setCurrencySymbol,
-  setRemoveFromCartItem,
-}) => {
-  const currencyFilter = prices.filter(
-    (item) => item.currency.label.toLowerCase() === currency
+class ModalItems extends React.Component {
+   currencyFilter = this.props.prices.filter(
+    (item) => item.currency.label.toLowerCase() === this.props.currency
   );
-  const currencySymbol = currencyFilter[0].currency.symbol;
+   currencySymbol = this.currencyFilter[0].currency.symbol;
 
-  setCurrencySymbol(currencySymbol);
 
-  const removeFromCart = (id) => {
-    setRemoveFromCartItem(id);
+
+  s = this.props.setCurrencySymbol(this.currencySymbol);
+
+   removeFromCart = (id) => {
+    this.props.setRemoveFromCartItem(id);
     toast.success("Item removed from cart", {
       position: "top-center",
     });
   }
+  render() {
+    const { id, name, gallery, brand, attributes, amount, setIncreaseAmount, setDecreaseAmount }
+  = this.props;
 
   return (
       <div className="item__content">
@@ -44,7 +35,7 @@ const ModalItems = ({
           <p>
             {brand} <br /> {name}
           </p>
-          <h4> {currencySymbol}{(currencyFilter[0].amount * amount).toFixed(2)}</h4>
+          <h4> {this.currencySymbol}{(this.currencyFilter[0].amount * amount).toFixed(2)}</h4>
           {attributes.map((attribute, index) => (
             <div key={index}>
               <Attributes attribute={attribute} />
@@ -55,7 +46,7 @@ const ModalItems = ({
         <div className="action__content">
           <button onClick={() => setIncreaseAmount(id)}>+</button>
           <p>{amount}</p>
-          <button onClick={amount === 1 ? () => removeFromCart(id):() => setDecreaseAmount(id)}>-</button>
+          <button onClick={amount === 1 ? () => this.removeFromCart(id):() => setDecreaseAmount(id)}>-</button>
         </div>
         <div className="img__content">
           <img src={gallery[0]} alt="product" />
@@ -63,6 +54,7 @@ const ModalItems = ({
         </div>
       </div>
   );
+} 
 };
 
 const mapStateToProps = (state) => ({

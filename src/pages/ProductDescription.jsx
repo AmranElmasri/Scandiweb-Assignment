@@ -1,60 +1,71 @@
 import React from "react";
 import { connect } from "react-redux";
-import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import ProductItemAttributes from "../components/Cart/Cart/itemAttributes";
 import parse from "html-react-parser";
 import { toast } from "react-toastify";
 import { setCartItems, setRemoveFromCartItem } from "../Store/Slices/dataSlice";
+import { fetchProduct } from "../Store/Slices/productSlice";
 
-const ProductDescription = ({
-  data,
-  currency,
-  cartItems,
-  setCartItems,
-  setRemoveFromCartItem,
-}) => {
-  const { id } = useParams();
+class ProductDescription extends React.Component {
+  state = {
+    image: "",
+    selectedAttributes: {},
+  };
 
-  if (!data.categories) {
-    return null;
+  componentDidMount() {
+    this.props.fetchProduct(this.props.match.params.id);
   }
 
-  const productDescription = data?.categories[0].products.find(
-    (item) => item.id === id
-  );
+  setAttribute = (attribute) => {
+    this.setState({
+      selectedAttributes: { ...this.state.selectedAttributes, ...attribute },
+    });
+  };  
 
-  const productBrice = productDescription.prices.find(
-    (sympol) => sympol.currency.label.toLowerCase() === currency
-  );
+  productBrice() {
+    return this.props.product?.data?.product.prices.find(
+      (item) => item.currency.label.toLowerCase() === this.props.currency
+    );
+  }
 
-  const inStock = productDescription.inStock;
-  const inCart = cartItems.find((item) => item.id === id);
+  inStock() {
+    if (this.props.product?.data?.product.inStock) {
+      return true;
+    }
+    return false;
+  }
 
-  const removeFromCart = () => {
-    setRemoveFromCartItem(id);
+  // inCart() {
+  //   const { cartItems } = this.props;
+  //   const inCart = cartItems.find(
+  //     (item) => item.id === this.props.product?.data?.product.id
+  //   );
+  //   if (inCart) return true;
+  //   return false;
+  // }
+
+  removeFromCart = () => {
+    this.props.setRemoveFromCartItem(this.props.product?.data?.product.id);
     toast.success("Item removed from cart", {
       position: "top-center",
     });
   };
 
-  const addToCart = () => {
-    if (inStock && !inCart) {
-      setCartItems({
-        id,
-        name: productDescription.name,
-        gallery: productDescription.gallery,
-        inStock: productDescription.inStock,
-        prices: productDescription.prices,
-        brand: productDescription.brand,
-        attributes: productDescription.attributes,
+  addToCart = () => {
+    if (this.inStock()) {
+      this.props.setCartItems({
+        id: this.props.product?.data?.product.id,
+        name: this.props.product?.data?.product.name,
+        gallery: this.props.product?.data?.product.gallery,
+        inStock: this.props.product?.data?.product.inStock,
+        prices: this.props.product?.data?.product.prices,
+        brand: this.props.product?.data?.product.brand,
+        attributes: this.props.product?.data?.product.attributes,
+        selectedAttributes: this.state.selectedAttributes,
         amount: 1,
       });
       toast.success("Item added to cart !", {
-        position: "top-center",
-      });
-    } else if (inCart) {
-      toast.warn("Item already in cart", {
         position: "top-center",
       });
     } else {
@@ -64,49 +75,63 @@ const ProductDescription = ({
     }
   };
 
-  return (
-    <Wrapper>
-      <div className="gallery">
-        {productDescription.gallery.map((item, index) => (
-          <div className="img__gallery" key={index}>
-            <img src={item} alt="img" />
-          </div>
-        ))}
-      </div>
-      <div className="main__content">
-        <div className="main__img">
-          <img src={productDescription.gallery[0]} alt="product" />
+  render() {
+    const { isLoading, error } = this.props;
+    if (this.props.product.length === 0) return null;
+    const productDescription = this.props.product?.data?.product;
+    return (
+      <Wrapper>
+        {isLoading && <div>Loading...</div>}
+        {error && <div>Error: {error}</div>}
+        <div className="gallery">
+          {productDescription.gallery.map((item, index) => (
+            <div
+              className="img__gallery"
+              key={index}
+              onClick={() => this.setState({ image: item })}
+            >
+              <img src={item} alt="img" />
+            </div>
+          ))}
         </div>
-        <div className="product__info">
-          <strong>{productDescription.brand}</strong>
-          <p>{productDescription.name}</p>
-          <div className="product__attribute">
-            {productDescription.attributes.map((attribute) => (
-              <ProductItemAttributes attribute={attribute} />
-            ))}
-          </div>
-          <div className="product__price">
-            <div className="price">PRICE:</div>
-            <span>{productBrice.currency.symbol}</span>
-            <span>{productBrice.amount}</span>
-          </div>
-          <div className="add__to__cart">
-            {inCart ? (
-              <button onClick={removeFromCart} className="remove__btn">
-                Remove from cart
-              </button>
+        <div className="main__content">
+          <div className="main__img">
+            {!this.state.image ? (
+              <img src={productDescription.gallery[0]} alt="product" />
             ) : (
-              <button onClick={addToCart}>Add to cart</button>
+              <img src={this.state.image} alt="product" />
             )}
           </div>
-          <div className="product__description">
-            {parse(productDescription.description)}
+          <div className="product__info">
+            <strong>{productDescription.brand}</strong>
+            <p>{productDescription.name}</p>
+            <div className="product__attribute">
+              {productDescription.attributes.map((attribute) => (
+                <div key={attribute.id}>
+                  <ProductItemAttributes
+                    attribute={attribute}
+                    setAttribute={this.setAttribute}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="product__price">
+              <div className="price">PRICE:</div>
+              <span>{this.productBrice()?.currency.symbol}</span>
+              <span>{this.productBrice()?.amount}</span>
+            </div>
+            <div className="add__to__cart">
+              <button onClick={this.addToCart}>Add to cart</button>
+            </div>
+            <div className="product__description">
+              {parse(productDescription.description)}
+            </div>
           </div>
         </div>
-      </div>
-    </Wrapper>
-  );
-};
+      </Wrapper>
+    );
+  }
+}
 
 const Wrapper = styled.div`
   width: 100%;
@@ -118,20 +143,22 @@ const Wrapper = styled.div`
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    flex: 10%;
+    flex: 20%;
     .img__gallery {
       width: 79px;
       height: 80px;
       margin-bottom: 10px;
+      cursor: pointer;
       img {
         width: 100%;
         height: 100%;
+        object-fit: contain;
       }
     }
   }
   .main__content {
     display: flex;
-    flex: 90%;
+    flex: 80%;
     justify-content: space-between;
     gap: 4rem;
     .main__img {
@@ -141,6 +168,7 @@ const Wrapper = styled.div`
       img {
         width: 100%;
         height: 100%;
+        object-fit: contain;
       }
     }
     .product__info {
@@ -214,11 +242,17 @@ const Wrapper = styled.div`
 `;
 
 const mapStateToProps = (state) => ({
-  data: state.data.data,
-  currency: state.data.currency,
   cartItems: state.data.cartItems,
+  product: state.product.product,
+  currency: state.data.currency,
+  isLoading: state.data.isLoading,
+  error: state.data.error,
 });
 
-const mapDispatchToProps = { setCartItems, setRemoveFromCartItem };
+const mapDispatchToProps = {
+  setCartItems,
+  setRemoveFromCartItem,
+  fetchProduct,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductDescription);
