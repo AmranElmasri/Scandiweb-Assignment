@@ -1,8 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  data: {},
-  category: localStorage.getItem("category") ? JSON.parse(localStorage.getItem("category")) : "all",
   currency: localStorage.getItem("currency")? JSON.parse(localStorage.getItem("currency")): "usd",
   cartItems: localStorage.getItem("cartItems") ? JSON.parse(localStorage.getItem("cartItems")) : [],
   currencySymbol: localStorage.getItem("currencySymbol") ? JSON.parse(localStorage.getItem("currencySymbol")) : "$",
@@ -12,13 +10,6 @@ export const dataSlice = createSlice({
   name: "data",
   initialState,
   reducers: {
-    getData: (state, action) => {
-      state.data = action.payload;
-    },
-    setCategory: (state, action) => {
-      state.category = action.payload;
-      localStorage.setItem("category", JSON.stringify(action.payload));
-    },
     setCurrency: (state, action) => {
       state.currency = action.payload;
       localStorage.setItem("currency", JSON.stringify(action.payload));
@@ -48,6 +39,6 @@ export const dataSlice = createSlice({
   },
 });
 
-export const { getData, setCategory, setCurrency, setCartItems, setIncreaseAmount, setDecreaseAmount, setCurrencySymbol, setRemoveFromCartItem } = dataSlice.actions;
+export const { setCurrency, setCartItems, setIncreaseAmount, setDecreaseAmount, setCurrencySymbol, setRemoveFromCartItem } = dataSlice.actions;
 
 export default dataSlice.reducer;

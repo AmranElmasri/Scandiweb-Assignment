@@ -3,13 +3,11 @@ import "./style.css";
 import middleLogo from "../../assets/a-logo.svg";
 import vector from "../../assets/Vector.svg";
 import { connect } from "react-redux";
-import usd from "../../assets/usd.svg";
-import gbp from "../../assets/gbp.svg";
-import jpy from "../../assets/jpy.svg";
 import upVector from "../../assets/upVector.svg";
-import { setCategory, setCurrency } from "../../Store/Slices/dataSlice";
+import { setCurrency } from "../../Store/Slices/dataSlice";
 import { CartModal } from "..";
 import { Link } from "react-router-dom";
+import NavList from "../NavList/NavList";
 
 class Navbar extends Component {
   state = {
@@ -17,42 +15,58 @@ class Navbar extends Component {
     openCart: false,
   };
 
-
   setActive = (cat) => {
     this.props.setCategory(cat);
   };
 
-
   setOpenCart = (open) => {
     this.setState({ openCart: open });
   };
-    
+
   menuRef = React.createRef();
 
   handleClickOutside() {
-      this.setState({ open: false });
+    this.setState({ open: false });
   }
 
-  handleClickOutside = this.handleClickOutside.bind(this);
+  handleClickOutsidee = this.handleClickOutside.bind(this);
 
   componentDidMount() {
-    document.addEventListener("mousedown", this.handleClickOutside);
+    document.addEventListener("mousedown", this.handleClickOutsidee);
   }
 
   componentWillUnmount() {
-    document.removeEventListener("mousedown", this.handleClickOutside);
+    document.removeEventListener("mousedown", this.handleClickOutsidee);
   }
 
   render() {
-    const { currency, category, data } = this.props;
+    const currencies = [
+      {
+        label: "USD",
+        symbol: "$",
+      },
+      {
+        label: "GBP",
+        symbol: "£",
+      },
+      {
+        label: "AUD",
+        symbol: "A$",
+      },
+      {
+        label: "JPY",
+        symbol: "¥",
+      },
+      {
+        label: "RUB",
+        symbol: "₽",
+      },
+    ];
+    const { currency } = this.props;
     const {openCart} = this.state;
-    if (!data.categories) {
-      return null;
-    }
-    const { prices } = data.categories[0].products[0];
     return (
       <nav className="navbar">
-        <div className="nav-cat">
+        {/* <div className="nav-cat">
           <div
             onClick={() => this.setActive("all")}
             className={
@@ -82,7 +96,9 @@ class Navbar extends Component {
             Tech
             <div />
           </div>
-        </div>
+        </div> */}
+
+        <NavList />
         <div className="nav-logo">
           <Link to={"/"}>
             <img src={middleLogo} alt="logo" />
@@ -98,9 +114,7 @@ class Navbar extends Component {
             >
               {currency === "usd" && (
                 <div>
-                  <span>
-                  &#36;
-                  </span>
+                  <span>&#36;</span>
                   <span>
                     <img
                       src={this.state.open ? upVector : vector}
@@ -166,15 +180,21 @@ class Navbar extends Component {
               }`}
             >
               <ul>
-                {prices.map(({currency: {label, symbol}}, index) => (
-                  <li key={index} className={`dropdownItem ${currency === label.toLowerCase() ? "active" : ""} `} onClick={() => this.props.setCurrency(label.toLowerCase())}>
+                {currencies.map(({ label, symbol }, index) => (
+                  <li
+                    key={index}
+                    className={`dropdownItem ${
+                      currency === label.toLowerCase() ? "active" : ""
+                    } `}
+                    onClick={() => this.props.setCurrency(label.toLowerCase())}
+                  >
                     <DropdownItem label={label} symbol={symbol} />
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-        <CartModal openCart={openCart} setOpenCart={this.setOpenCart}/>
+          <CartModal openCart={openCart} setOpenCart={this.setOpenCart} />
         </div>
       </nav>
     );
@@ -182,18 +202,20 @@ class Navbar extends Component {
 }
 
 function DropdownItem({ label, symbol }) {
-  return <>
-   <span className="dropDown-span">{symbol}</span> {" "}
-   <span className="dropDown-span">{label}</span>
-  </>
+  return (
+    <>
+      <span className="dropDown-span">{symbol}</span>{" "}
+      <span className="dropDown-span">{label}</span>
+    </>
+  );
 }
 
 const mapStateToProps = (state) => ({
   data: state.data.data,
-  category: state.data.category,
+  categories: state.categories.categories,
   currency: state.data.currency,
 });
 
-const mapDispatchToProps = { setCategory, setCurrency };
+const mapDispatchToProps = { setCurrency };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

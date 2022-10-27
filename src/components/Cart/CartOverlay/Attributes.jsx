@@ -20,7 +20,7 @@ class Attributes extends React.Component {
       <>
         {attribute.type === "text" && (
           <>
-            <p style={{ padding: "0", margin: "10px 0" }}>{attribute.name} :</p>
+            <P>{attribute.name} :</P>
             {attribute.items.map((item) => (
               <span
                 className={
@@ -39,9 +39,9 @@ class Attributes extends React.Component {
         )}
         {attribute.type === "swatch" && (
           <>
-            <p style={{ padding: "0", margin: "10px 0 0" }}>
+            <P>
               {attribute.name} :
-            </p>
+            </P>
             <Swatch>
               {attribute.items.map((item) => (
                 <div
@@ -63,6 +63,12 @@ class Attributes extends React.Component {
     );
   }
 }
+
+const P = styled.p`
+  padding: 0;
+  margin: 10px 0;
+
+`
 
 const Swatch = styled.div`
   width: 116px;

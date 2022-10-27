@@ -7,44 +7,6 @@
   height: 80px;
 }
 
-.nav-cat {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex: 30%;
-  height: 100%;
-}
-
-.all-cat,
-.clothes-cat,
-.tech-cat {
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  transition: all 0.3s ease-in-out;
-}
-
-.all-cat.active,
-.clothes-cat.active,
-.tech-cat.active {
-  color: #5ece7b;
-  border-bottom: solid#5ece7b 2px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-}
-.all-cat:hover,
-.clothes-cat:hover,
-.tech-cat:hover {
-  color: #5ece7b;
-}
 
 .nav-logo {
   flex: 60%;

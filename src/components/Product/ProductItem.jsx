@@ -6,40 +6,22 @@ import { setCartItems } from "../../Store/Slices/dataSlice";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
-const ProductItem = ({
-  id,
-  name,
-  gallery,
-  inStock,
-  prices,
-  brand,
-  attributes,
-  currency,
-  setCartItems,
-  cartItems,
-}) => {
-  const currencyFilter = prices.filter(
-    (item) => item.currency.label.toLowerCase() === currency
-  );
-  const inCart = cartItems.find((item) => item.name === name);
+class ProductItem extends React.Component {
+  // inCart = this.props.cartItems.find((item) => item.name === this.props.name);
 
-  const addToCart = () => {
-    if (inStock && !inCart) {
-      setCartItems({
-        id,
-        name,
-        gallery,
-        inStock,
-        prices,
-        brand,
-        attributes,
-        amount: 1
+  addToCart = () => {
+    if (this.props.inStock) {
+      this.props.setCartItems({
+        id: this.props.id,
+        name: this.props.name,
+        gallery: this.props.gallery,
+        inStock: this.props.inStock,
+        prices: this.props.prices,
+        brand: this.props.brand,
+        attributes: this.props.attributes,
+        amount: 1,
       });
       toast.success("Item added to cart !", {
-        position: "top-center",
-      });
-    } else if (inCart) {
-      toast.warn("Item already in cart", {
         position: "top-center",
       });
     } else {
@@ -48,22 +30,35 @@ const ProductItem = ({
       });
     }
   };
-  return (
-    <Wrapper>
-      <div className="product__content">
-        <Link className="product__img" to={`/product/${id}`}>
-          <img src={gallery[0]} alt="img" />
-          {!inStock && <div className="product__out">OUT OF STOCK</div>}
+  render() {
+    const currencyFilter = this.props.prices.filter(
+      (item) => item.currency.label.toLowerCase() === this.props.currency
+    );
+    const { id, name, gallery, inStock, brand } = this.props;
+    return (
+      <Wrapper>
+        <Link to={`/product/${id}`} className="product__link">
+          <div className="product__content">
+            <div className="product__img" to={`/product/${id}`}>
+              <img src={gallery[0]} alt="img" />
+              {!inStock && <div className="product__out">OUT OF STOCK</div>}
+            </div>
+            <div className="product__name">
+              {brand} {name}
+            </div>
+            <div className="price__text">
+              {currencyFilter[0].currency.symbol}
+              {currencyFilter[0].amount}
+            </div>
+          </div>
         </Link>
-        <div className="product__name">{brand} {name}</div>
-        <div className="price__text">{currencyFilter[0].currency.symbol}{currencyFilter[0].amount}</div>
-        <div className="cart__badge" onClick={addToCart}>
+        <div className="cart__badge" onClick={this.addToCart}>
           <img src={whiteCartIcon} alt="cart-icon" />
         </div>
-      </div>
-    </Wrapper>
-  );
-};
+      </Wrapper>
+    );
+  }
+}
 
 const Wrapper = styled.div`
   width: 386px;
@@ -73,6 +68,9 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   transition: all 0.3s ease-in-out;
+  .product__link {
+    position: relative;
+  }
   .product__content {
     display: flex;
     flex-direction: column;
@@ -88,6 +86,7 @@ const Wrapper = styled.div`
       img {
         width: 100%;
         height: 100%;
+        object-fit: contain;
       }
       .product__out {
         position: absolute;
@@ -113,27 +112,28 @@ const Wrapper = styled.div`
       font-weight: 500;
       width: 90%;
     }
-    .cart__badge {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background-color: #5ece7b;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: absolute;
-      top: 60%;
-      right: 15%;
-      opacity: 0;
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;
-    }
+  }
+  .cart__badge {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #5ece7b;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 60%;
+    right: 15%;
+    opacity: 0;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
   }
   &:hover {
     box-shadow: 0px 4px 35px rgba(168, 172, 176, 0.19);
     .cart__badge {
       opacity: 1;
+      z-index: 999;
     }
   }
 `;
