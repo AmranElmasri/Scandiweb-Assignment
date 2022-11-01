@@ -10,18 +10,35 @@ import { fetchProduct } from "../Store/Slices/productSlice";
 class ProductDescription extends React.Component {
   state = {
     image: "",
-    selectedAttributes: {},
+    selectedAttributes: [],
   };
 
   componentDidMount() {
     this.props.fetchProduct(this.props.match.params.id);
   }
 
-  setAttribute = (attribute) => {
-    this.setState({
-      selectedAttributes: { ...this.state.selectedAttributes, ...attribute },
-    });
-  };  
+  setAttribute = (attribute, selectedItem) => {
+    if (
+      this.state.selectedAttributes.find(
+        (item) => item.id === attribute.id
+      )
+    ) {
+      this.setState({
+        selectedAttributes: this.state.selectedAttributes.map((item) => {
+          if (item.id === attribute.id)
+            return { ...attribute, selectedItem };
+          return item;
+        }),
+      });
+    } else {
+      this.setState({
+        selectedAttributes: [
+          ...this.state.selectedAttributes,
+          { ...attribute, selectedItem },
+        ],
+      });
+    }
+  };
 
   productBrice() {
     return this.props.product?.data?.product.prices.find(
@@ -35,15 +52,6 @@ class ProductDescription extends React.Component {
     }
     return false;
   }
-
-  // inCart() {
-  //   const { cartItems } = this.props;
-  //   const inCart = cartItems.find(
-  //     (item) => item.id === this.props.product?.data?.product.id
-  //   );
-  //   if (inCart) return true;
-  //   return false;
-  // }
 
   removeFromCart = () => {
     this.props.setRemoveFromCartItem(this.props.product?.data?.product.id);
@@ -61,8 +69,12 @@ class ProductDescription extends React.Component {
         inStock: this.props.product?.data?.product.inStock,
         prices: this.props.product?.data?.product.prices,
         brand: this.props.product?.data?.product.brand,
-        attributes: this.props.product?.data?.product.attributes,
-        selectedAttributes: this.state.selectedAttributes,
+        // attributes: this.props.product?.data?.product.attributes,
+        // selectedAttributes: this.state.selectedAttributes,
+        attributes:
+          this.state.selectedAttributes.length > 0
+            ? this.state.selectedAttributes
+            : this.props.product?.data?.product.attributes,
         amount: 1,
       });
       toast.success("Item added to cart !", {

@@ -33,7 +33,7 @@ class itemAttributes extends React.Component {
                   style={{ backgroundColor: item.value }}
                   onClick={() => {
                     this.setSwatchActive(item.id);
-                    this.props.setAttribute({swatch: item.value});
+                    this.props.setAttribute(attribute, item.id);
                   }}
                   key={item.id}
                 ></div>
@@ -53,11 +53,11 @@ class itemAttributes extends React.Component {
                 }
                 onClick={() => {
                   this.setTextActive(item.id);
-                  this.props.setAttribute({text: item.value});
+                  this.props.setAttribute(attribute, item.id);
                 }}
                 key={item.id}
               >
-                {item.displayValue}
+                {item.value}
               </span>
             ))}
           </>
