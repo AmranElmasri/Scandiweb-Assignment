@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import cartIcon from "../../../assets/cart.svg";
-import ModalItems from "./ModalItems";
+import ModalItem from "./ModalItem";
 
 class Modal extends Component {
   render() {
@@ -40,7 +40,7 @@ class Modal extends Component {
                     amount,
                   }) => (
                     <div key={id}>
-                      <ModalItems
+                      <ModalItem
                         id={id}
                         name={name}
                         gallery={gallery}
@@ -177,7 +177,6 @@ const Modall = styled.div`
       padding: 0.3rem 0.2rem;
       border: 1px solid #000;
       margin: 0 0.2rem;
-      cursor: pointer;
       margin-top: 0.5rem;
       width: 20px;
       height: 20px;

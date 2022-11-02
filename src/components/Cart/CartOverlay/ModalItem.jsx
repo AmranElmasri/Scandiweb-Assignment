@@ -9,7 +9,7 @@ import {
 } from "../../../Store/Slices/dataSlice";
 import Attributes from "./Attributes";
 
-class ModalItems extends React.Component {
+class ModalItem extends React.Component {
    currencyFilter = this.props.prices.filter(
     (item) => item.currency.label.toLowerCase() === this.props.currency
   );
@@ -68,4 +68,4 @@ const mapDispatchToProps = {
   setRemoveFromCartItem
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ModalItems);
+export default connect(mapStateToProps, mapDispatchToProps)(ModalItem);
