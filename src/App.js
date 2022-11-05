@@ -94,6 +94,7 @@ const mapStateToProps = (state) => {
     categories: state.categories.categories,
     activeCategory: state.categories.activeCategory,
     products: state.products.products,
+    cartOpen: state.data.cartOpen,
   };
 };
 const mapDispatchToProps = { fetchCategories, fetchProducts };

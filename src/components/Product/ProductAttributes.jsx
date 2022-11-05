@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 
-class itemAttributes extends React.Component {
+class ProductAttributes extends React.Component {
   state = {
-    activeText: { id: this.props.attribute.items[0].id },
-    activeSwatch: { id: this.props.attribute.items[0].id },
+    activeText: { id: null },
+    activeSwatch: { id: null },
   };
 
   setTextActive = (id) => {
@@ -13,16 +13,6 @@ class itemAttributes extends React.Component {
   setSwatchActive = (id) => {
     this.setState({ activeSwatch: { id } });
   };
-
-  componentDidMount() {
-    const { attribute } = this.props;
-    if (!!attribute.selectedItem && attribute.type === "text") {
-      this.setState({ activeText: { id: attribute.selectedItem } });
-    }
-    if (!!attribute.selectedItem && attribute.type === "swatch") {
-      this.setState({ activeSwatch: { id: attribute.selectedItem } });
-    }
-  }
 
   render() {
     const { attribute } = this.props;
@@ -40,6 +30,10 @@ class itemAttributes extends React.Component {
                       : "swatch"
                   }
                   style={{ backgroundColor: item.value }}
+                  onClick={() => {
+                    this.setSwatchActive(item.id);
+                    this.props.setAttribute(attribute, item.id);
+                  }}
                   key={item.id}
                 ></div>
               ))}
@@ -53,6 +47,10 @@ class itemAttributes extends React.Component {
                 className={
                   this.state.activeText.id === item.id ? "text active" : "text"
                 }
+                onClick={() => {
+                  this.setTextActive(item.id);
+                  this.props.setAttribute(attribute, item.id);
+                }}
                 key={item.id}
               >
                 {item.value}
@@ -80,6 +78,7 @@ const Wrapper = styled.div`
     border: 1px solid #1d1f22;
     padding: 0.5rem 1rem;
     margin-right: 8px;
+    cursor: pointer;
     &.active {
       background: #1d1f22;
       color: #ffffff;
@@ -98,6 +97,7 @@ const Swatch = styled.div`
   .swatch {
     width: 32px;
     height: 16px;
+    cursor: pointer;
     border: 1px solid gray;
     &.active {
       border: 2px solid #5ece7b;
@@ -105,4 +105,4 @@ const Swatch = styled.div`
   }
 `;
 
-export default itemAttributes;
+export default ProductAttributes;

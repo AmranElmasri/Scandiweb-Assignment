@@ -19,23 +19,22 @@ class ModalItem extends React.Component {
 
   s = this.props.setCurrencySymbol(this.currencySymbol);
 
-   removeFromCart = (id) => {
-    this.props.setRemoveFromCartItem(id);
+   removeFromCart = (key) => {
+    this.props.setRemoveFromCartItem(key);
     toast.success("Item removed from cart", {
       position: "top-center",
     });
   }
   render() {
-    const { id, name, gallery, brand, attributes, amount, setIncreaseAmount, setDecreaseAmount }
+    const { name, gallery, brand, attributes, amount, setIncreaseAmount, setDecreaseAmount, keyy }
   = this.props;
-
   return (
       <div className="item__content">
         <div className="left__contect">
           <p>
             {brand} <br /> {name}
           </p>
-          <h4> {this.currencySymbol}{(this.currencyFilter[0].amount * amount).toFixed(2)}</h4>
+          <h4> {this.currencySymbol}{(this.currencyFilter[0].amount).toFixed(2)}</h4>
           {attributes.map((attribute, index) => (
             <div key={index}>
               <Attributes attribute={attribute} />
@@ -44,9 +43,9 @@ class ModalItem extends React.Component {
         </div>
         <div className="rigth__content">
         <div className="action__content">
-          <button onClick={() => setIncreaseAmount(id)}>+</button>
+          <button onClick={() => setIncreaseAmount(keyy)}>+</button>
           <p>{amount}</p>
-          <button onClick={amount === 1 ? () => this.removeFromCart(id):() => setDecreaseAmount(id)}>-</button>
+          <button onClick={amount === 1 ? () => this.removeFromCart(keyy):() => setDecreaseAmount(keyy)}>-</button>
         </div>
         <div className="img__content">
           <img src={gallery[0]} alt="product" />

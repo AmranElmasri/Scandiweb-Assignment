@@ -6,13 +6,13 @@
 }
 body {
   box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 .container {
   padding: 0 1rem;
   margin: 0 auto;
 }
+
 
 /* Small */
 @media (min-width: 768px) {

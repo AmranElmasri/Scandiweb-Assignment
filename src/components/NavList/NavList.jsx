@@ -12,16 +12,18 @@ class NavList extends Component {
       <List>
         {categories.map((cat, index) => {
           return (
-            <Link to={"/"} key={index}>
-              <li
-                className={activeCategory === cat.name ? "active" : ""}
-                onClick={() => {
-                  this.props.setActiveCategory(cat.name);
-                  this.props.fetchProducts(cat.name);
-                }}
-              >
-                {cat.name}
-              </li>
+            <Link
+              to={"/"}
+              key={index}
+              className={
+                activeCategory === cat.name ? "cat__link active" : "cat__link"
+              }
+              onClick={() => {
+                this.props.setActiveCategory(cat.name);
+                this.props.fetchProducts(cat.name);
+              }}
+            >
+              {cat.name}
             </Link>
           );
         })}
@@ -38,8 +40,7 @@ const List = styled.ul`
   align-items: center;
   list-style: none;
   flex: 20%;
-
-  li {
+  .cat__link {
     padding: 10px;
     font-size: 1rem;
     font-weight: 600;
@@ -49,12 +50,13 @@ const List = styled.ul`
     height: 100%;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-transform: uppercase;
     &:hover {
       color: #5ece7b;
     }
     &.active {
       color: #5ece7b;
-      border-bottom: #5ece7b 1px solid;
+      border-bottom: #5ece7b 2px solid;
     }
   }
 `;

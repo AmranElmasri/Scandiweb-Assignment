@@ -5,15 +5,22 @@ import {
   setCurrencySymbol,
   setDecreaseAmount,
   setIncreaseAmount,
+  setRemoveFromCartItem,
 } from "../../../Store/Slices/dataSlice";
-import CartItemAttributes from "./itemAttributes";
+import CartItemAttributes from "./ItemAttributes";
 import rightArrow from "../../../assets/right-arrow.svg";
 import leftArrow from "../../../assets/left-arrow.svg";
+import { toast } from "react-toastify";
 
 class CartItem extends React.Component {
+  removeFromCart = (key) => {
+    this.props.setRemoveFromCartItem(key);
+    toast.success("Item removed from cart", {
+      position: "top-center",
+    });
+  }
   render() {
     const {
-      id,
       name,
       gallery,
       prices,
@@ -24,6 +31,7 @@ class CartItem extends React.Component {
       setIncreaseAmount,
       setDecreaseAmount,
       setCurrencySymbol,
+      keyy,
     } = this.props;
     const currencyFilter = prices.filter(
       (item) => item.currency.label.toLowerCase() === currency
@@ -33,21 +41,13 @@ class CartItem extends React.Component {
     setCurrencySymbol(currencySymbol);
     return (
       <>
-        <hr
-          style={{
-            width: "100%",
-            height: "1px",
-            backgroundColor: "#E5E5E5",
-            margin: "20px 0",
-            textAlign: "center",
-          }}
-        />
+        <Hr />
         <Wrapper>
           <div className="cart__item__left">
             <strong>{brand}</strong>
             <p>{name}</p>
             <h3>
-              {currencySymbol} {(currencyFilter[0].amount * amount).toFixed(2)}
+              {currencySymbol} {currencyFilter[0].amount.toFixed(2)}
             </h3>
             {attributes.map((attribute, index) => (
               <div key={index}>
@@ -57,11 +57,10 @@ class CartItem extends React.Component {
           </div>
           <div className="cart__item__right">
             <div className="right__actions">
-              <button onClick={() => setIncreaseAmount(id)}>+</button>
+              <button onClick={() => setIncreaseAmount(keyy)}>+</button>
               <p>{amount}</p>
               <button
-                onClick={() => setDecreaseAmount(id)}
-                disabled={amount === 1}
+                onClick={amount === 1 ? () => this.removeFromCart(keyy):() => setDecreaseAmount(keyy)}
               >
                 -
               </button>
@@ -137,6 +136,7 @@ const Wrapper = styled.div`
       img {
         width: 100%;
         height: 100%;
+        object-fit: contain;
       }
       .right__arrow {
         position: absolute;
@@ -155,6 +155,13 @@ const Wrapper = styled.div`
     }
   }
 `;
+const Hr = styled.hr`
+  width: 100%;
+  height: 1px;
+  background-color: #e5e5e5;
+  margin: 20px 0;
+  text-align: center;
+`;
 
 const mapStateToProps = (state) => ({
   currency: state.data.currency,
@@ -163,6 +170,7 @@ const mapDispatchToProps = {
   setIncreaseAmount,
   setDecreaseAmount,
   setCurrencySymbol,
+  setRemoveFromCartItem,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CartItem);

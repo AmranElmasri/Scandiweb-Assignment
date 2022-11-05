@@ -1,10 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import ProductItemAttributes from "../components/Cart/Cart/itemAttributes";
+import ProductAttributes from "../components/Product/ProductAttributes";
 import parse from "html-react-parser";
 import { toast } from "react-toastify";
-import { setCartItems, setRemoveFromCartItem } from "../Store/Slices/dataSlice";
+import { setCartItems, setRemoveFromCartItem, setIncreaseAmount } from "../Store/Slices/dataSlice";
 import { fetchProduct } from "../Store/Slices/productSlice";
 
 class ProductDescription extends React.Component {
@@ -19,14 +19,11 @@ class ProductDescription extends React.Component {
 
   setAttribute = (attribute, selectedItem) => {
     if (
-      this.state.selectedAttributes.find(
-        (item) => item.id === attribute.id
-      )
+      this.state.selectedAttributes.find((item) => item.id === attribute.id)
     ) {
       this.setState({
         selectedAttributes: this.state.selectedAttributes.map((item) => {
-          if (item.id === attribute.id)
-            return { ...attribute, selectedItem };
+          if (item.id === attribute.id) return { ...attribute, selectedItem };
           return item;
         }),
       });
@@ -46,6 +43,30 @@ class ProductDescription extends React.Component {
     );
   }
 
+  inCart = () => this.props.cartItems.find(
+    (item) => item.id === this.props.product?.data?.product.id
+  );
+
+  findItemWithSelectedAttributes = () => {
+    const  selectedAttribute = this.state.selectedAttributes[0]?.selectedItem;
+    const { cartItems } = this.props;
+    const product = cartItems.find((item) =>
+      item.attributes.find(ele => ele.selectedItem === selectedAttribute)
+    )
+    return product;
+
+  };
+
+  inCartWithSpecificAttribute = () => {
+    let bool = false;
+    this.findItemWithSelectedAttributes()?.attributes.forEach(attribute => {
+      if(attribute.selectedItem && this.state.selectedAttributes.findIndex(item => item.selectedItem === attribute.selectedItem) !== -1){
+        bool = true;
+      }
+    }); 
+    return bool;
+  } 
+
   inStock() {
     if (this.props.product?.data?.product.inStock) {
       return true;
@@ -60,8 +81,16 @@ class ProductDescription extends React.Component {
     });
   };
 
+
   addToCart = () => {
-    if (this.inStock()) {
+    if(this.inStock() && this.inCart() && this.inCartWithSpecificAttribute()){
+      this.props.setIncreaseAmount(this.findItemWithSelectedAttributes()?.key);
+      toast.success("Item updated !", {
+        position: "top-center",
+      });
+      return;
+    }
+    else if (this.inStock()) {
       this.props.setCartItems({
         id: this.props.product?.data?.product.id,
         name: this.props.product?.data?.product.name,
@@ -69,18 +98,19 @@ class ProductDescription extends React.Component {
         inStock: this.props.product?.data?.product.inStock,
         prices: this.props.product?.data?.product.prices,
         brand: this.props.product?.data?.product.brand,
-        // attributes: this.props.product?.data?.product.attributes,
-        // selectedAttributes: this.state.selectedAttributes,
         attributes:
           this.state.selectedAttributes.length > 0
             ? this.state.selectedAttributes
             : this.props.product?.data?.product.attributes,
         amount: 1,
+        key: Date.now(),
       });
       toast.success("Item added to cart !", {
         position: "top-center",
       });
-    } else {
+      return;
+    }
+    else {
       toast.error("Item out of stock", {
         position: "top-center",
       });
@@ -109,9 +139,9 @@ class ProductDescription extends React.Component {
         <div className="main__content">
           <div className="main__img">
             {!this.state.image ? (
-              <img src={productDescription.gallery[0]} alt="product" />
+              <img src={productDescription.gallery[0]} alt="main default" />
             ) : (
-              <img src={this.state.image} alt="product" />
+              <img src={this.state.image} alt="main" />
             )}
           </div>
           <div className="product__info">
@@ -120,7 +150,7 @@ class ProductDescription extends React.Component {
             <div className="product__attribute">
               {productDescription.attributes.map((attribute) => (
                 <div key={attribute.id}>
-                  <ProductItemAttributes
+                  <ProductAttributes
                     attribute={attribute}
                     setAttribute={this.setAttribute}
                   />
@@ -154,8 +184,8 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: start;
-    align-items: center;
-    flex: 20%;
+    align-items: flex-start;
+    flex: 10%;
     .img__gallery {
       width: 79px;
       height: 80px;
@@ -170,7 +200,7 @@ const Wrapper = styled.div`
   }
   .main__content {
     display: flex;
-    flex: 80%;
+    flex: 90%;
     justify-content: space-between;
     gap: 4rem;
     .main__img {
@@ -228,8 +258,7 @@ const Wrapper = styled.div`
         }
       }
       .add__to__cart {
-        button,
-        .remove__btn {
+        button {
           background: #5ece7b;
           padding: 1rem 2rem;
           width: 279px;
@@ -244,9 +273,6 @@ const Wrapper = styled.div`
           align-items: center;
           cursor: pointer;
           text-transform: uppercase;
-        }
-        .remove__btn {
-          background: #da4a4a;
         }
       }
     }
@@ -265,6 +291,7 @@ const mapDispatchToProps = {
   setCartItems,
   setRemoveFromCartItem,
   fetchProduct,
+  setIncreaseAmount,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductDescription);

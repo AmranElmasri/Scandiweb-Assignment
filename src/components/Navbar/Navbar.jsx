@@ -4,29 +4,25 @@ import middleLogo from "../../assets/a-logo.svg";
 import vector from "../../assets/Vector.svg";
 import { connect } from "react-redux";
 import upVector from "../../assets/upVector.svg";
-import { setCurrency } from "../../Store/Slices/dataSlice";
+import { setCurrency, setSwitcherOpen, setCartOpen } from "../../Store/Slices/dataSlice";
 import { CartModal } from "..";
 import { Link } from "react-router-dom";
 import NavList from "../NavList/NavList";
 
 class Navbar extends Component {
-  state = {
-    open: false,
-    openCart: false,
-  };
 
   setActive = (cat) => {
     this.props.setCategory(cat);
   };
 
   setOpenCart = (open) => {
-    this.setState({ openCart: open });
+    this.props.setCartOpen(open);
   };
 
   menuRef = React.createRef();
 
   handleClickOutside() {
-    this.setState({ open: false });
+    this.props.setSwitcherOpen(false);
   }
 
   handleClickOutsidee = this.handleClickOutside.bind(this);
@@ -63,40 +59,8 @@ class Navbar extends Component {
       },
     ];
     const { currency } = this.props;
-    const {openCart} = this.state;
     return (
       <nav className="navbar">
-        {/* <div className="nav-cat">
-          <div
-            onClick={() => this.setActive("all")}
-            className={
-              category === "all" ? "all-cat active" : "all-cat"
-            }
-          >
-            All
-            <div />
-          </div>
-          <div
-            onClick={() => this.setActive("clothes")}
-            className={
-              category === "clothes"
-                ? "clothes-cat active"
-                : "clothes-cat"
-            }
-          >
-            Clothes
-            <div />
-          </div>
-          <div
-            onClick={() => this.setActive("tech")}
-            className={
-              category === "tech" ? "tech-cat active" : "tech-cat"
-            }
-          >
-            Tech
-            <div />
-          </div>
-        </div> */}
 
         <NavList />
         <div className="nav-logo">
@@ -109,7 +73,10 @@ class Navbar extends Component {
             <div
               className="menu-trigger"
               onClick={() => {
-                this.setState({ ...this.state, open: !this.state.open });
+                if(this.props.cartOpen){
+                  this.setOpenCart(false);
+                }
+                this.props.setSwitcherOpen(!this.props.switcherOpen);
               }}
             >
               {currency === "usd" && (
@@ -117,9 +84,8 @@ class Navbar extends Component {
                   <span>&#36;</span>
                   <span>
                     <img
-                      src={this.state.open ? upVector : vector}
+                      src={this.props.switcherOpen ? upVector : vector}
                       alt="vector"
-                      style={{ marginLeft: "8px" }}
                     />
                   </span>
                 </div>
@@ -129,9 +95,8 @@ class Navbar extends Component {
                   &#163;
                   <span>
                     <img
-                      src={this.state.open ? upVector : vector}
+                      src={this.props.switcherOpen ? upVector : vector}
                       alt="vector"
-                      style={{ marginLeft: "8px" }}
                     />
                   </span>
                 </div>
@@ -141,9 +106,8 @@ class Navbar extends Component {
                   A$
                   <span>
                     <img
-                      src={this.state.open ? upVector : vector}
+                      src={this.props.switcherOpen ? upVector : vector}
                       alt="vector"
-                      style={{ marginLeft: "8px" }}
                     />
                   </span>
                 </div>
@@ -153,9 +117,8 @@ class Navbar extends Component {
                   &#165;
                   <span>
                     <img
-                      src={this.state.open ? upVector : vector}
+                      src={this.props.switcherOpen ? upVector : vector}
                       alt="vector"
-                      style={{ marginLeft: "8px" }}
                     />
                   </span>
                 </div>
@@ -165,9 +128,8 @@ class Navbar extends Component {
                   ₽
                   <span>
                     <img
-                      src={this.state.open ? upVector : vector}
+                      src={this.props.switcherOpen ? upVector : vector}
                       alt="vector"
-                      style={{ marginLeft: "8px" }}
                     />
                   </span>
                 </div>
@@ -176,7 +138,7 @@ class Navbar extends Component {
 
             <div
               className={`dropdown-menu ${
-                this.state.open ? "active" : "inactive"
+                this.props.switcherOpen ? "active" : "inactive"
               }`}
             >
               <ul>
@@ -194,7 +156,7 @@ class Navbar extends Component {
               </ul>
             </div>
           </div>
-          <CartModal openCart={openCart} setOpenCart={this.setOpenCart} />
+          <CartModal setOpenCart={this.setOpenCart} />
         </div>
       </nav>
     );
@@ -214,8 +176,10 @@ const mapStateToProps = (state) => ({
   data: state.data.data,
   categories: state.categories.categories,
   currency: state.data.currency,
+  switcherOpen: state.data.switcherOpen,
+  cartOpen: state.data.cartOpen,
 });
 
-const mapDispatchToProps = { setCurrency };
+const mapDispatchToProps = { setCurrency, setSwitcherOpen, setCartOpen };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
