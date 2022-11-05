@@ -6,21 +6,33 @@ import cartIcon from "../../../assets/cart.svg";
 import ModalItem from "./ModalItem";
 
 class Modal extends Component {
+
   render() {
-    const { openCart, setOpenCart, cartItems, currency, currencySymbol } = this.props;
+    const { setOpenCart, cartItems, currency, currencySymbol, switcherOpen, cartOpen } = this.props;
     const subTotal = cartItems.reduce(
       (acc, c) => acc + c.amount * c.prices.filter(item => item.currency.label.toLowerCase() === currency)[0].amount,
     0);
+    const cartItemQuantity = cartItems.reduce((acc, c) => acc + c.amount, 0);
+    
+    if (this.props.cartOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
 
     return (
       <>
-        <Wrapper onClick={() => setOpenCart(!openCart)}>
+        <Wrapper onClick={() => {
+          if(!switcherOpen) {
+            setOpenCart(!cartOpen);
+          }
+        }}>
           <img src={cartIcon} alt="cartIcon" className="cart__icon" />
           {cartItems.length > 0 && (
-            <span className="cart__badge">{cartItems.length}</span>
+            <span className="cart__badge">{cartItemQuantity}</span>
           )}
         </Wrapper>
-        {openCart && (
+        {cartOpen && (
           <Modall onClick={() => setOpenCart(false)}>
             <div className="contents" onClick={(e) => e.stopPropagation()}>
               <div>
@@ -38,8 +50,9 @@ class Modal extends Component {
                     brand,
                     attributes,
                     amount,
+                    key,
                   }) => (
-                    <div key={id}>
+                    <div key={key}>
                       <ModalItem
                         id={id}
                         name={name}
@@ -49,12 +62,13 @@ class Modal extends Component {
                         brand={brand}
                         attributes={attributes}
                         amount={amount}
+                        keyy={key}
                       />
                     </div>
                   )
                 )
               ) : (
-                <h3 style={{textAlign: "center"}}>Cart is empty</h3>
+                <h3>Cart is empty</h3>
               )}
               <div className="total">
                 <strong>Total</strong>
@@ -170,6 +184,7 @@ const Modall = styled.div`
         img {
           width: 100%;
           height: 100%;
+          object-fit: contain;
         }
       }
     }
@@ -230,6 +245,9 @@ const Modall = styled.div`
         }
       }
     }
+    h3 {
+      text-align: center;
+    }
   }
   @media (min-width: 1440px) {
     .contents {
@@ -242,6 +260,8 @@ const mapStateToProps = (state) => ({
   cartItems: state.data.cartItems,
   currency: state.data.currency,
   currencySymbol: state.data.currencySymbol,
+  switcherOpen: state.data.switcherOpen,
+  cartOpen: state.data.cartOpen,
 });
 
 export default connect(mapStateToProps)(Modal);

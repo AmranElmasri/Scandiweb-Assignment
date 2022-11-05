@@ -2,15 +2,18 @@ import React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import whiteCartIcon from "../../assets/white-cart-badge.svg";
-import { setCartItems } from "../../Store/Slices/dataSlice";
+import { setCartItems, setIncreaseAmount } from "../../Store/Slices/dataSlice";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
 class ProductItem extends React.Component {
-  // inCart = this.props.cartItems.find((item) => item.name === this.props.name);
+  inCart = () => this.props.cartItems.find((item) => item.name === this.props.name);
+
+  getItemKeyById = () => this.props.cartItems.find(item => item.id === this.props.id)?.key;
+
 
   addToCart = () => {
-    if (this.props.inStock) {
+    if (this.props.inStock && !this.inCart()) {
       this.props.setCartItems({
         id: this.props.id,
         name: this.props.name,
@@ -20,8 +23,14 @@ class ProductItem extends React.Component {
         brand: this.props.brand,
         attributes: this.props.attributes,
         amount: 1,
+        key: Date.now(),
       });
       toast.success("Item added to cart !", {
+        position: "top-center",
+      });
+    } else if (this.props.inStock && this.inCart()) {
+      this.props.setIncreaseAmount(this.getItemKeyById());
+      toast.success("Item updated !", {
         position: "top-center",
       });
     } else {
@@ -143,6 +152,6 @@ const mapStateToProps = (state) => ({
   cartItems: state.data.cartItems,
 });
 
-const mapDispatchToProps = { setCartItems };
+const mapDispatchToProps = { setCartItems, setIncreaseAmount };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProductItem);

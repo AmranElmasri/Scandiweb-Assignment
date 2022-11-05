@@ -11,7 +11,7 @@ const Cart = ({ cartItems, currency,  currencySymbol }) => {
   const subTotal = cartItems.reduce((acc, c) => acc + c.amount * c.prices.filter((item) => item.currency.label.toLowerCase() === currency)[0].amount, 0);
 
   return (
-    <div style={{marginBottom: '274px'}}>
+    <div >
       <P>Cart</P>
       {cartItems.length > 0 ? (
         <>
@@ -25,6 +25,7 @@ const Cart = ({ cartItems, currency,  currencySymbol }) => {
               brand,
               attributes,
               amount,
+              key
             }) => (
               <div key={id}>
                 <CartItem
@@ -36,19 +37,12 @@ const Cart = ({ cartItems, currency,  currencySymbol }) => {
                   brand={brand}
                   attributes={attributes}
                   amount={amount}
+                  keyy={key}
                 />
               </div>
             )
           )}
-          <hr
-            style={{
-              width: "100%",
-              height: "1px",
-              backgroundColor: "#E5E5E5",
-              margin: "20px 0",
-              textAlign: "center",
-            }}
-          />
+          <Hr />
           <Result>
             <div>Tax 21%: <span className="tax__span"> $42.00</span></div>
             <div>Quantity: <span className="tax__span">{Quantity}</span></div>
@@ -57,11 +51,11 @@ const Cart = ({ cartItems, currency,  currencySymbol }) => {
           </Result>
         </>
       ) : (
-        <h2 style={{ textAlign: "center" }}>
+        <H2>
           Cart is empty
           <br />
           <Link to={"/"}> Back to shopping </Link>
-        </h2>
+        </H2>
       )}
     </div>
   );
@@ -101,6 +95,18 @@ const Result = styled.div`
 
   }
 `
+const Hr = styled.hr`
+  width: 100%;
+  height: 1px;
+  background-color: #E5E5E5;
+  margin: 20px 0;
+  text-align: center;
+
+`
+const H2 = styled.h2`
+text-align: center;
+`
+
 
 const mapStateToProps = (state) => ({
   cartItems: state.data.cartItems,
