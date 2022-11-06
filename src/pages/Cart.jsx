@@ -67,6 +67,7 @@ const P = styled.p`
 `;
 
 const Result = styled.div`
+  margin-bottom: 17rem;
   div{
     font-size: 24px;
     font-weight: 400;
@@ -92,7 +93,10 @@ const Result = styled.div`
     justify-content: center;
     align-items: center;
     cursor: pointer;
-
+    transition: all 0.3s;
+    &:hover {
+      background: #4DBF6E;
+    }
   }
 `
 const Hr = styled.hr`
