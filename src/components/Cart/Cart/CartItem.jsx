@@ -8,8 +8,6 @@ import {
   setRemoveFromCartItem,
 } from "../../../Store/Slices/dataSlice";
 import CartItemAttributes from "./ItemAttributes";
-import rightArrow from "../../../assets/right-arrow.svg";
-import leftArrow from "../../../assets/left-arrow.svg";
 import { toast } from "react-toastify";
 import Slider from "./Slider";
 
