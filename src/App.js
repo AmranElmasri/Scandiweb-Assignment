@@ -3,46 +3,11 @@ import { connect } from "react-redux";
 import { Switch, Route } from "react-router-dom";
 import { Category, Cart, ProductDescription } from "./pages";
 import { Navbar } from "./components";
-// import gql from "graphql-tag";
-// import { Query } from "react-apollo";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchCategories } from "./Store/Slices/categoriesSlice";
 import { fetchProducts } from "./Store/Slices/productsSlice";
 
-// const GET_DATA = gql`
-//   query Query {
-//     categories {
-//       name
-//       products {
-//         id
-//         name
-//         inStock
-//         gallery
-//         description
-//         category
-//         attributes {
-//           id
-//           name
-//           type
-//           items {
-//             displayValue
-//             value
-//             id
-//           }
-//         }
-//         prices {
-//           currency {
-//             label
-//             symbol
-//           }
-//           amount
-//         }
-//         brand
-//       }
-//     }
-//   }
-// `;
 
 class App extends Component {
   componentDidMount() {
@@ -65,13 +30,6 @@ class App extends Component {
             <Route path="/cart" component={Cart } />
             <Route path="/product/:id" component={ProductDescription } />
           </Switch>
-          {/* <Query query={GET_DATA}>
-            {({ loading, error, data }) => {
-              if (loading) return <div>Loading...</div>;
-              if (error) return <div>Error :{error}</div>;
-              this.props.getData(data);
-            }}
-          </Query> */}
           <ToastContainer
             position="top-right"
             autoClose={5000}

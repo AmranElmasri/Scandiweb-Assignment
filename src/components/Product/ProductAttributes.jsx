@@ -15,7 +15,7 @@ class ProductAttributes extends React.Component {
   };
 
   render() {
-    const { attribute } = this.props;
+    const { attribute, selectedAttributes } = this.props;
     return (
       <Wrapper>
         {attribute.type === "swatch" ? (
@@ -25,7 +25,10 @@ class ProductAttributes extends React.Component {
               {attribute.items.map((item) => (
                 <div
                   className={
-                    this.state.activeSwatch.id === item.id
+                    this.state.activeSwatch.id === item.id &&
+                    !!selectedAttributes.find(
+                      (att) => att.selectedItem === item.id && att.id === attribute.id
+                    )
                       ? "swatch active"
                       : "swatch"
                   }
@@ -45,11 +48,16 @@ class ProductAttributes extends React.Component {
             {attribute.items.map((item) => (
               <span
                 className={
-                  this.state.activeText.id === item.id ? "text active" : "text"
+                  this.state.activeText.id === item.id &&
+                  !!selectedAttributes.find(
+                    (att) => att.selectedItem === item.id && att.id === attribute.id
+                  )
+                    ? "text active"
+                    : "text"
                 }
                 onClick={() => {
                   this.setTextActive(item.id);
-                  this.props.setAttribute(attribute, item.id);
+                  this.props.setAttribute(attribute, `${item.id}`);
                 }}
                 key={item.id}
               >
@@ -101,6 +109,7 @@ const Swatch = styled.div`
     border: 1px solid gray;
     &.active {
       border: 2px solid #5ece7b;
+      transform: scale(1.1);
     }
   }
 `;

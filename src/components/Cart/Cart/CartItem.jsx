@@ -11,6 +11,7 @@ import CartItemAttributes from "./ItemAttributes";
 import rightArrow from "../../../assets/right-arrow.svg";
 import leftArrow from "../../../assets/left-arrow.svg";
 import { toast } from "react-toastify";
+import Slider from "./Slider";
 
 class CartItem extends React.Component {
   removeFromCart = (key) => {
@@ -65,15 +66,7 @@ class CartItem extends React.Component {
                 -
               </button>
             </div>
-            <div className="cart__item__img">
-              <img src={gallery[0]} alt="product" />
-              <span className="right__arrow">
-                <img src={rightArrow} alt="arrow" />
-              </span>
-              <span className="left__arrow">
-                <img src={leftArrow} alt="arrow" />
-              </span>
-            </div>
+              <Slider images={gallery} />
           </div>
         </Wrapper>
       </>
@@ -127,30 +120,6 @@ const Wrapper = styled.div`
       p {
         font-size: 24px;
         font-weight: 500;
-      }
-    }
-    .cart__item__img {
-      width: 200px;
-      height: 288px;
-      position: relative;
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-      .right__arrow {
-        position: absolute;
-        bottom: 16px;
-        right: 16px;
-        background-color: #fff;
-        cursor: pointer;
-      }
-      .left__arrow {
-        position: absolute;
-        bottom: 16px;
-        right: 48px;
-        background-color: #fff;
-        cursor: pointer;
       }
     }
   }

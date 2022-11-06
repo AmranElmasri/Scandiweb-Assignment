@@ -6,16 +6,25 @@ import parse from "html-react-parser";
 import { toast } from "react-toastify";
 import { setCartItems, setRemoveFromCartItem, setIncreaseAmount } from "../Store/Slices/dataSlice";
 import { fetchProduct } from "../Store/Slices/productSlice";
+import { motion } from "framer-motion";
 
 class ProductDescription extends React.Component {
-  state = {
-    image: "",
-    selectedAttributes: [],
-  };
+  constructor(props){
+    super(props);
+    this.carousel = React.createRef();
+
+    this.state = {
+      image: "",
+      selectedAttributes: [],
+    };
+    
+  }
+  
 
   componentDidMount() {
     this.props.fetchProduct(this.props.match.params.id);
   }
+
 
   setAttribute = (attribute, selectedItem) => {
     if (
@@ -48,24 +57,42 @@ class ProductDescription extends React.Component {
   );
 
   findItemWithSelectedAttributes = () => {
-    const  selectedAttribute = this.state.selectedAttributes[0]?.selectedItem;
+    const { selectedAttributes } = this.state;
     const { cartItems } = this.props;
-    const product = cartItems.find((item) =>
-      item.attributes.find(ele => ele.selectedItem === selectedAttribute)
-    )
+    let product = null;
+    for(let i =0; i < selectedAttributes.length; i++){
+      product = cartItems.find((item) =>
+        item.attributes.find(attribute => attribute.selectedItem === selectedAttributes[i].selectedItem)
+      )
+      if(!product) return false;
+    }
     return product;
-
   };
 
-  inCartWithSpecificAttribute = () => {
-    let bool = false;
-    this.findItemWithSelectedAttributes()?.attributes.forEach(attribute => {
-      if(attribute.selectedItem && this.state.selectedAttributes.findIndex(item => item.selectedItem === attribute.selectedItem) !== -1){
-        bool = true;
+  // inCartWithSpecificAttribute = () => {
+  //   let bool = false;
+  //   this.findItemWithSelectedAttributes()?.attributes?.forEach(attribute => {
+  //     if(attribute.selectedItem && this.state.selectedAttributes.findIndex(item => item.selectedItem === attribute.selectedItem) !== -1){
+  //       bool = true;
+  //     }
+  //   }); 
+  //   return bool;
+  // } 
+
+  inCartWithDefaultAttribute = () => {
+    let product = null;
+    const { cartItems } = this.props;
+    cartItems?.forEach(item => {
+      if(item.id === this.props.product?.data?.product.id){
+        item.attributes.forEach(attribute => {
+          if(!attribute.hasOwnProperty("selectedItem")){
+            product = item;
+          }
+        })
       }
-    }); 
-    return bool;
-  } 
+    })
+    return product;
+  }
 
   inStock() {
     if (this.props.product?.data?.product.inStock) {
@@ -80,17 +107,24 @@ class ProductDescription extends React.Component {
       position: "top-center",
     });
   };
-
-
+  
+  
   addToCart = () => {
-    if(this.inStock() && this.inCart() && this.inCartWithSpecificAttribute()){
+    if (this.inStock() && this.inCart() && !!this.findItemWithSelectedAttributes()) {
       this.props.setIncreaseAmount(this.findItemWithSelectedAttributes()?.key);
       toast.success("Item updated !", {
         position: "top-center",
       });
+      this.setState({selectedAttributes: []});
       return;
-    }
-    else if (this.inStock()) {
+    } else if (this.inStock() && this.inCart() && !!this.inCartWithDefaultAttribute() && this.state.selectedAttributes.length === 0) {
+      this.props.setIncreaseAmount(this.inCartWithDefaultAttribute()?.key);
+      toast.success("Item updated !", {
+        position: "top-center",
+      });
+      this.setState({selectedAttributes: []});
+      return;
+    } else if (this.inStock()) {
       this.props.setCartItems({
         id: this.props.product?.data?.product.id,
         name: this.props.product?.data?.product.name,
@@ -108,9 +142,9 @@ class ProductDescription extends React.Component {
       toast.success("Item added to cart !", {
         position: "top-center",
       });
+      this.setState({selectedAttributes: []});
       return;
-    }
-    else {
+    } else {
       toast.error("Item out of stock", {
         position: "top-center",
       });
@@ -125,17 +159,19 @@ class ProductDescription extends React.Component {
       <Wrapper>
         {isLoading && <div>Loading...</div>}
         {error && <div>Error: {error}</div>}
-        <div className="gallery">
-          {productDescription.gallery.map((item, index) => (
-            <div
-              className="img__gallery"
-              key={index}
-              onClick={() => this.setState({ image: item })}
-            >
-              <img src={item} alt="img" />
-            </div>
-          ))}
-        </div>
+        <motion.div className="gallery carousel" ref={this.carousel} whileTap={{cursor: "grabbing"}}>
+          <motion.div className="inner__carousel" drag="y" dragConstraints={{ bottom: 0, top: -119 }}>
+            {productDescription.gallery.map((image) => (
+              <motion.div
+                className="img__gallery"
+                key={image}
+                onClick={() => this.setState({ image: image })}
+              >
+                <img src={image} alt="img" className={this.state.image === image ? "active__image": ""}/>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
         <div className="main__content">
           <div className="main__img">
             {!this.state.image ? (
@@ -153,6 +189,7 @@ class ProductDescription extends React.Component {
                   <ProductAttributes
                     attribute={attribute}
                     setAttribute={this.setAttribute}
+                    selectedAttributes={this.state.selectedAttributes}
                   />
                 </div>
               ))}
@@ -184,17 +221,29 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: start;
-    align-items: flex-start;
+    align-items: center;
     flex: 10%;
-    .img__gallery {
-      width: 79px;
-      height: 80px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
+    height: 511px;
+    overflow: hidden;
+    cursor: grab;
+    margin-left: -40px;
+    .inner__carousel {
+      /* height: 100%; */
+      .img__gallery {
+        width: 79px;
+        height: 80px;
+        margin-bottom: 10px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          pointer-events: none;
+          &.active__image {
+            border: 1px solid #5ece7b;
+            transform: scale(1.1);
+            transition: all 0.3s;
+          }
+        }
       }
     }
   }
@@ -273,7 +322,12 @@ const Wrapper = styled.div`
           align-items: center;
           cursor: pointer;
           text-transform: uppercase;
+          transition: all 0.3s;
+          &:hover {
+            background: #4dbb6f;
+          }
         }
+
       }
     }
   }

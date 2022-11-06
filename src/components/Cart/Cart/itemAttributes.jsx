@@ -101,6 +101,7 @@ const Swatch = styled.div`
     border: 1px solid gray;
     &.active {
       border: 2px solid #5ece7b;
+      transform: scale(1.1);
     }
   }
 `;
